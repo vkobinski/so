@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  nfs-server:
+    build:
+      context: .
+      dockerfile: ./nfs-dockerfile
+
+    container_name: nfs_server
+    ports:
+      - "2049:2049"
+    privileged: true
+    volumes:
+      - /tmp/exports/home:/tmp/exports/home
+
+  nfs-client:
+    build:
+      context: .
+      dockerfile: ssh-dockerfile
+    container_name: nfs_client
+    depends_on:
+      - nfs-server
+    volumes:
+      - nfs_data:/mnt/home
+    command: ["/bin/bash", "-c", "tail -f /dev/null"]
+
+volumes:
+  nfs_data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=nfs_server,rw
+      device: ":tmp/exports/home"

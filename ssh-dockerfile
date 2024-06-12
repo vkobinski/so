@@ -1,0 +1,11 @@
+# Use an Ubuntu base image
+FROM ubuntu:22.04
+
+# Install NFS client utilities
+RUN apt-get update && \
+    apt-get install -y nfs-common 
+
+# Create a directory for the NFS mount
+RUN mkdir -p /mnt/home
+
+ENTRYPOINT ["mount", "-t", "nfs", "nfs_server:/tmp/exports/home /mnt/home"]
